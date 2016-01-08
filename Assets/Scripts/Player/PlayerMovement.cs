@@ -22,7 +22,7 @@ public class PlayerMovement : NetworkBehaviour {
     public float runDeacceleration = 10;   // Deacceleration that occurs when running on the ground
     public float airAcceleration = 2.0f;  // Air accel
     public float airDeacceleration = 2.0f;    // Deacceleration experienced when opposite strafing
-    public float airControl = 0.3f;  // How precise air control is
+    public float airControl = 1f;  // How precise air control is
     public float sideStrafeAcceleration = 50;   // How fast acceleration occurs to get up to sideStrafeSpeed when side strafing
     public float sideStrafeSpeed = 1;    // What the max speed to generate when side strafing
     public float jumpSpeed = 8.0f;  // The speed at which the character's up axis gains when hitting jump

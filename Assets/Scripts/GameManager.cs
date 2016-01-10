@@ -10,6 +10,8 @@ public class GameManager : MonoBehaviour {
 
 	private static Dictionary<string, PlayerHandler> players = new Dictionary<string, PlayerHandler> ();
 
+	public PlayerHandler localPlayer = null;
+
 	public NetworkManager networkManager;
 
 	public string alias = "player";
@@ -41,6 +43,14 @@ public class GameManager : MonoBehaviour {
 	}
 
 	public static PlayerHandler GetPlayer(string id) {
-		return players[id];
+
+		if(players.ContainsKey(id))
+			return players[id];
+
+		return null;
+	}
+
+	public Dictionary<string, PlayerHandler> GetPlayers() {
+		return players;
 	}
 }

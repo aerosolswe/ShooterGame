@@ -44,6 +44,8 @@ public class PlayerHandler : NetworkBehaviour {
 		if(!isLocalPlayer) {
 			DisableComponents();
 			AssignRemoteLayer();
+		} else {
+			GameManager.instance.localPlayer = this;
 		}
 
 		SetDefaults();
@@ -55,10 +57,6 @@ public class PlayerHandler : NetworkBehaviour {
 		string netId = GetComponent<NetworkIdentity>().netId.ToString();
 
 		GameManager.RegisterPlayer(netId, this);
-
-		/*if(isLocalPlayer)
-			GameManager.instance.SetPlayerAlias(this.transform.name);*/
-
 	}
 
 	void OnDisable() {
@@ -95,8 +93,12 @@ public class PlayerHandler : NetworkBehaviour {
 			string victim = GetComponent<Player>().alias;
 			string killer = "environment";
 
-			if(attacker != null)
+			if(attacker != null) {
 				killer = attacker.alias;
+				attacker.CmdAddScore(1);
+			} else {
+				GetComponent<Player>().CmdAddScore(-1);
+			}
 
 			RpcDie(killer, victim);
 		}
@@ -117,6 +119,7 @@ public class PlayerHandler : NetworkBehaviour {
 		transform.FindChild("Capsule").gameObject.SetActive(false);*/
 
 		if(isLocalPlayer) {
+			movement.velocity = Vector3.zero;
 			WarpPlayer(networkManager.GetStartPosition().position, networkManager.GetStartPosition().rotation);
 			//isDead = false;
 		}

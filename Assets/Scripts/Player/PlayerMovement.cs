@@ -27,11 +27,20 @@ public class PlayerMovement : NetworkBehaviour {
     public float sideStrafeSpeed = 1;    // What the max speed to generate when side strafing
     public float jumpSpeed = 8.0f;  // The speed at which the character's up axis gains when hitting jump
 	public float moveScale = 1.0f;
+	public float walkScale = 0.4f;
 	public float currentJumpLength = 0.0f;
 
     /* Frame occuring factors */
     public float gravity = 20.0f;
     public float friction = 6;  
+
+	public float height = 1.7f;
+	public float crouchHeight = 0.75f;
+
+	private bool isWalking;
+
+	private bool isCrouching;
+	private bool wantToStand;
 
     private bool wishJump;
 	private bool sidesTouching;
@@ -123,6 +132,9 @@ public class PlayerMovement : NetworkBehaviour {
         wishdir.Normalize();
         wishspeed *= scale;
 
+		if(isWalking || isCrouching)
+			wishspeed *= walkScale;
+
         // CPM: Aircontrol
         var wishspeed2 = wishspeed;
         if(Vector3.Dot(velocity, wishdir) < 0)
@@ -139,7 +151,7 @@ public class PlayerMovement : NetworkBehaviour {
         Accelerate(wishdir, wishspeed, accel);
         if(airControl > 0)
             AirControl(wishdir, wishspeed2);
-		
+
 		// Apply gravity
 		velocity.y -= gravity * Time.deltaTime;
     }
@@ -202,14 +214,24 @@ public class PlayerMovement : NetworkBehaviour {
         var wishspeed = wishdir.magnitude;
         wishspeed *= moveSpeed;
 
+		if(isWalking || isCrouching)
+			wishspeed *= walkScale;
+
         Accelerate(wishdir, wishspeed, runAcceleration);
 
         // Jumping
         if(wishJump) {
             velocity.y = jumpSpeed;
             wishJump = false;
-        }
+		}
+
+		// Apply gravity
+		velocity.y -= 1 * Time.deltaTime;
     }
+
+	public void ApplyForce(Vector3 force) {
+		velocity += force;
+	}
 
     private void ApplyFriction(float t) {
         Vector3 vec = velocity;
@@ -282,10 +304,40 @@ public class PlayerMovement : NetworkBehaviour {
     private void GetInput() {
         horizontal = CrossPlatformInputManager.GetAxisRaw("Horizontal");
         vertical = CrossPlatformInputManager.GetAxisRaw("Vertical");
-    }
 
-	public void KnockBack(Vector3 direction, float force) {
-		controller.Move(direction * force);
+		if(CrossPlatformInputManager.GetButtonDown("Walk")) {
+			isWalking = true;
+		}
+
+		if(CrossPlatformInputManager.GetButtonUp("Walk")) {
+			isWalking = false;
+		}
+
+		if(CrossPlatformInputManager.GetButtonDown("Crouch")) {
+			isCrouching = true;
+			controller.height = crouchHeight;
+		}
+
+		if(CrossPlatformInputManager.GetButtonUp("Crouch")) {
+			isCrouching = false;
+			wantToStand = true;
+		}
+
+		if(wantToStand) {
+			InvokeRepeating("CanIStand", 0, 0.25f);
+		}
+	}
+
+	private void CanIStand() {
+		RaycastHit hit;
+		//Debug.DrawRay(transform.position, Vector3.up * 1.25f, Color.red, 100, true);
+		bool hitSomething = Physics.Raycast(transform.position, Vector3.up, out hit, 1.25f);
+
+		if(!hitSomething) {
+			controller.height = height;
+			wantToStand = false;
+			CancelInvoke("CanIStand");
+		}
 	}
 
     private void OnControllerColliderHit(ControllerColliderHit hit) {

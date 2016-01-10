@@ -9,6 +9,16 @@ public class PlayerTriggerHandler : MonoBehaviour {
 			GetComponent<PlayerHandler>().TakeDamage(100, null);
 		}
 
+		if(other.gameObject.tag == "ForceBox") {
+			GetComponent<PlayerMovement>().ApplyForce(other.gameObject.GetComponent<ForceBox>().force);
+		}
+
+		if(other.gameObject.tag == "TPBox") {
+			GetComponent<PlayerHandler>().WarpPlayer(other.gameObject.GetComponent<TPBox>().position, other.transform.rotation);
+			if(other.gameObject.GetComponent<TPBox>().resetVelocity)
+				GetComponent<PlayerMovement>().velocity = Vector3.zero;
+		}
+
 	}
 
 	

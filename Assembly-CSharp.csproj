@@ -63,6 +63,7 @@
      <Compile Include="Assets\Scripts\Player\PlayerWeapon.cs" />
      <Compile Include="Assets\Scripts\UI\DeathCounter\DeathCounter.cs" />
      <Compile Include="Assets\Scripts\UI\DeathCounter\DeathHandler.cs" />
+     <Compile Include="Assets\Scripts\UI\Hud\Hud.cs" />
      <Compile Include="Assets\Scripts\UI\MapsDropdown.cs" />
      <Compile Include="Assets\Scripts\UI\PositionInfo\PositionInfo.cs" />
      <Compile Include="Assets\Scripts\UI\Scoreboard\Scoreboard.cs" />
